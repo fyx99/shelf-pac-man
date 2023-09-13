@@ -29,3 +29,8 @@ def basic_shelf_maximize_minimum_coefficient():
     assert result[2] == 1
     
     assert prob.status == OptimizationStatus.SOLVED
+    
+    
+if __name__ == "__main__":
+    basic_shelf_maximize_coefficient_sum()
+    basic_shelf_maximize_minimum_coefficient()

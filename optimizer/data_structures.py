@@ -1,7 +1,7 @@
 ## data structures to model business problem
 
 from enum import Enum
-from typing import List
+from typing import Dict, List
 
 
 class PartTier:
@@ -14,7 +14,7 @@ class PartTier:
         return f"PartTier(w={self.width}, h={self.height}, d={self.depth})"
         
 class Shelf:
-    def __init__(self, part_tiers):
+    def __init__(self, part_tiers: List[PartTier]):
         self.part_tiers = part_tiers
         
     
@@ -54,37 +54,36 @@ class OptimizationStatus(Enum):
     UNSOLVED = 3
 
 class OptimizationProblem:
-    def __init__(self, shelf: Shelf, articles: List[Article], minimum_articles=1, maximum_articles=None, mode: OptimizationMode=None):
+    def __init__(self, shelf: Shelf, articles: List[Article], minimum_articles=1, maximum_articles=None, mode: OptimizationMode=None, result=None):
         self.shelf = shelf
         self.articles = articles
         self.minimum_articles = minimum_articles if isinstance(minimum_articles, list) else [minimum_articles] * len(articles)
         self.maximum_articles = maximum_articles if isinstance(maximum_articles, list) else [maximum_articles] * len(articles)
         self.mode = mode
+        self.result = result
         self.status = OptimizationStatus.UNSOLVED
         
     def check_feasibility():
         pass
         
 class Node:
-    def __init__(self, level, count_from_left, lower_bound, upper_bound, used_width, target_value, articles):
+    def __init__(self, level=0, count_from_left=0, lower_bound=None, used_width=None, target_value=None, articles=None):
         self.level = level
         self.count_from_left = count_from_left
         self.lower_bound = lower_bound
-        self.upper_bound = upper_bound
         self.used_width = used_width
         self.target_value = target_value
-        self.articles = articles
-        self._articles_coefficient_sum = None
+        self.articles:Dict[Article, int] = articles    # this is a array with the count of the articles
+
+    
+    def equals(self, other):
+        if len(self.articles) != len(other.articles):
+            return False
+        for s, o in zip(self.articles, other.articles):
+            if s != o:
+                return False
+        return True
         
-    @property
-    def articles_coefficient_sum(self):
-        if not self._articles_coefficient_sum:
-            ed = {article: 0 for article in self.articles}
-            for article in self.articles:
-                ed[article] += article.coefficient
-            self._articles_coefficient_sum = ed
-        return self._articles_coefficient_sum
-            
     def __repr__(self):
         return f"Node(w={self.used_width}, target={self.target_value}, articles={self.articles})"
         
