@@ -6,8 +6,10 @@ from optimizer.utils import add_article_dict
 def next_best_item_maximize(node: Node, optimization_problem: OptimizationProblem):
     best_article = None
     best_article_factor = None
-    for next_article in optimization_problem.articles:
+    for i, next_article in enumerate(optimization_problem.articles):
         ### here we should of course check if the maximum number of articles allows this
+        if node.articles[next_article] >= optimization_problem.maximum_articles[i]:
+            continue
         if optimization_problem.shelf.total_width < (node.used_width + next_article.width):
             ### not possible to fit
             continue
@@ -15,22 +17,26 @@ def next_best_item_maximize(node: Node, optimization_problem: OptimizationProble
         if not best_article or greedy_bound_coefficient_factor > best_article_factor:
             best_article = next_article
             best_article_factor = greedy_bound_coefficient_factor
-    return best_article, sum([k.coefficient * v for k, v in node.articles.items()]) + next_article.coefficient
+    if not best_article:
+        return None, None
+    return best_article, node.target_value + best_article.coefficient
 
 
 def next_best_item_maximize_minimum(node: Node, optimization_problem: OptimizationProblem):
     best_article = None
     best_article_factor = None
     best_lower_bound = None
-    for next_article in optimization_problem.articles:
+    for i, next_article in enumerate(optimization_problem.articles):
         ### here we should of course check if the maximum number of articles allows this
+        if node.articles[next_article] >= optimization_problem.maximum_articles[i]:
+            continue
         if optimization_problem.shelf.total_width < (node.used_width + next_article.width):
             ### not possible to fit
             continue
         current_articles = node.articles
         next_articles = add_article_dict(current_articles, next_article)
 
-        current_coefficient_product_min = min([k.coefficient * v for k, v in current_articles.items()])
+        current_coefficient_product_min = node.target_value
         next_coefficient_product_min = min([k.coefficient * v for k, v in next_articles.items()])
         coefficient_product_min_increase_width_factor = (next_coefficient_product_min - current_coefficient_product_min) /  next_article.width
         greedy_bound_coefficient_factor = coefficient_product_min_increase_width_factor
@@ -48,7 +54,7 @@ next_item_by_mode = {
     
 
 def greedy_lower_bound(node: Node, optimization_problem: OptimizationProblem):
-    
+    print("GREEDY LOWER BOUND")
 
     current_node = node
     
@@ -61,7 +67,8 @@ def greedy_lower_bound(node: Node, optimization_problem: OptimizationProblem):
             count_from_left=0,
             lower_bound=next_article_lower_bound,
             used_width=current_node.used_width + next_article.width,
-            articles=add_article_dict(current_node.articles, next_article)
+            articles=add_article_dict(current_node.articles, next_article),
+            target_value=next_article_lower_bound
         )
 
     return current_node.lower_bound

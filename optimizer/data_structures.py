@@ -67,7 +67,7 @@ class OptimizationProblem:
         pass
         
 class Node:
-    def __init__(self, level=0, count_from_left=0, lower_bound=None, used_width=None, target_value=None, articles=None):
+    def __init__(self, level=0, count_from_left=0, lower_bound=None, used_width=None, target_value=0, articles=None):
         self.level = level
         self.count_from_left = count_from_left
         self.lower_bound = lower_bound
@@ -79,7 +79,7 @@ class Node:
     def equals(self, other):
         if len(self.articles) != len(other.articles):
             return False
-        for s, o in zip(self.articles, other.articles):
+        for s, o in zip(list(self.articles.values()), list(other.articles.values())):
             if s != o:
                 return False
         return True

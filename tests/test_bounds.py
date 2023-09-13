@@ -8,18 +8,19 @@ def test_next_best_item_maximize():
     a = [Article(width=2, coefficient=1), Article(width=1, coefficient=2), Article(width=3, coefficient=3)]
     s1 = Shelf(part_tiers=[PartTier(width=10)])
 
-    prob = OptimizationProblem(s1, a, 1, None, OptimizationMode.MAXIMIZE_COEFFICIENT_SUM)
+    prob = OptimizationProblem(s1, a, 1, 99999999, OptimizationMode.MAXIMIZE_COEFFICIENT_SUM)
     
     node = Node(
         lower_bound=1,
         used_width=6,
-        articles={a[0]: 1, a[1]: 1, a[2]: 1}
+        articles={a[0]: 1, a[1]: 1, a[2]: 1},
+        target_value=6
     )
     
     next_article, next_article_lower_bound = next_best_item_maximize(node, prob)
     
     assert next_article == a[1]
-    assert next_article_lower_bound == 9
+    assert next_article_lower_bound == 8
     
         
 def test_next_best_item_maximize_minimum():
@@ -27,7 +28,7 @@ def test_next_best_item_maximize_minimum():
     a = [Article(width=2, coefficient=1), Article(width=1, coefficient=2), Article(width=3, coefficient=3)]
     s1 = Shelf(part_tiers=[PartTier(width=10)])
 
-    prob = OptimizationProblem(s1, a, 1, None, OptimizationMode.MAXIMIZE_COEFFICIENT_SUM)
+    prob = OptimizationProblem(s1, a, 1, 99999999, OptimizationMode.MAXIMIZE_COEFFICIENT_SUM)
     
     node = Node(
         lower_bound=1,
@@ -49,15 +50,23 @@ def test_greedy_lower_bound():
     node = Node(
         lower_bound=1,
         used_width=6,
-        articles={a[0]: 1, a[1]: 1, a[2]: 1}
+        articles={a[0]: 1, a[1]: 1, a[2]: 1},
+        target_value=6
     )
     
-    prob = OptimizationProblem(s1, a, 1, None, OptimizationMode.MAXIMIZE_COEFFICIENT_SUM)
+    prob = OptimizationProblem(s1, a, 1, 99999999, OptimizationMode.MAXIMIZE_COEFFICIENT_SUM)
     node_lower_bound = greedy_lower_bound(node, prob)
     
-    assert node_lower_bound == 35
+    assert node_lower_bound == 34
     
-    prob = OptimizationProblem(s1, a, 1, None, OptimizationMode.MAXIMIZE_MINIMUM_COEFFICIENT)
+    node = Node(
+        lower_bound=1,
+        used_width=6,
+        articles={a[0]: 1, a[1]: 1, a[2]: 1},
+        target_value=1
+    )
+    
+    prob = OptimizationProblem(s1, a, 1, 99999999, OptimizationMode.MAXIMIZE_MINIMUM_COEFFICIENT)
     node_lower_bound = greedy_lower_bound(node, prob)
     
     assert node_lower_bound == 5

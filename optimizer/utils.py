@@ -3,12 +3,8 @@ from typing import Dict
 
 from optimizer.data_structures import Article
 
-def generate_test_articles(seed):
+def generate_test_articles(seed, width=20, occupancy=0.2, average_width=4, width_std=2):
     random.seed(seed)
-    width = 20
-    occupancy = 0.2
-    average_width = 4
-    width_std = 2
     sum_width_articles = 0
     articles = []
     while sum_width_articles < (width * occupancy):
